@@ -1,0 +1,2 @@
+itertime="25000"
+basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow xfsprogs dosfstools procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages glibc-locales linux lvm2"
