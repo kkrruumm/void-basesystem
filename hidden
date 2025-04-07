@@ -1,2 +1,24 @@
-itertime="25000"
-basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages glibc-locales xbps iproute2"
+#!/bin/bash
+
+device=$(cat /sys/devices/virtual/dmi/id/product_name)
+
+case "$device" in
+	# desktop
+	"Z890 Nova WiFi")
+		itertime="25000"
+	;;
+	# thinkpad t480
+	"20L6S09E00")
+		itertime="30000"
+		intel_pstate="false"
+	;;
+esac
+
+case "$libc" in
+	glibc)
+		basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages glibc-locales xbps iproute2"
+	;;
+	musl)
+		basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages xbps iproute2"
+	;;
+esac
