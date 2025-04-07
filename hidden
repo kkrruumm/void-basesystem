@@ -12,6 +12,9 @@ case "$device" in
 		itertime="30000"
 		intel_pstate="false"
 	;;
+	*)
+		itertime="30000"
+	;;
 esac
 
 case "$libc" in
