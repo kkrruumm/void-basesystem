@@ -1,16 +1,18 @@
 #!/bin/bash
 
 device=$(cat /sys/devices/virtual/dmi/id/product_name)
+echo "Hidden file triggered, running on $device with $libc"
 
 case "$device" in
-	# desktop
 	"Z890 Nova WiFi")
 		itertime="25000"
 	;;
-	# thinkpad t480
 	"20L6S09E00")
 		itertime="30000"
 		intel_pstate="false"
+	;;
+	"B550 AORUS PRO AC")
+		itertime="60000"
 	;;
 	*)
 		itertime="30000"
