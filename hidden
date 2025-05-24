@@ -12,7 +12,7 @@ case "$device" in
 		intel_pstate="false"
 	;;
 	"B550 AORUS PRO AC")
-		itertime="60000"
+		itertime="90000"
 	;;
 	*)
 		itertime="30000"
