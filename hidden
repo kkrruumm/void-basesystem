@@ -27,3 +27,5 @@ case "$libc" in
 		basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages xbps iproute2"
 	;;
 esac
+
+initrdhostonly="true"
