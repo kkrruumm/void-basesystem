@@ -126,9 +126,6 @@ post_install() {
 			echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
 				{ commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
 
-			# flatpak everything
-			system "su ${username} -c 'flatpak install flathub com.github.iwalton3.jellyfin-media-player com.github.tchx84.Flatseal com.obsproject.Studio com.valvesoftware.Steam dev.vencord.Vesktop io.gitlab.librewolf-community org.gimp.GIMP org.kde.kdenlive org.prismlauncher.PrismLauncher'"
-
 			system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
 
 		;;
