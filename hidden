@@ -45,7 +45,7 @@ post_install() {
 				{ commandFailure="Cloning dotfiles has failed." ; die ; }
 
 			if [ "$desktop" == "sway" ]; then
-				install fuzzel fnott foot mpv Thunar waybar imv papirus-icon-theme gnome-keyring gnome-ssh-askpass grimshot pulsemixer tuigreet tumbler swaylock xdg-desktop-portal-gtk
+				install fuzzel fnott foot mpv Thunar Waybar imv papirus-icon-theme gnome-keyring gnome-ssh-askpass grimshot pulsemixer tuigreet tumbler swaylock xdg-desktop-portal-gtk
 
 				if [ ! -e /mnt/home/"${username}"/.config ] ; then
 					mkdir /mnt/home/"${username}"/.config ||
