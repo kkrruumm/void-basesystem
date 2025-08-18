@@ -66,7 +66,7 @@ post_install() {
 			fi
 
 			for i in .bashrc .kshrc .profile ; do
-				cp /root/dotfiles/"${i}" /mnt/home/"${username}" ||
+				cat /root/dotfiles/"${i}" > /mnt/home/"${username}"/"${i}" ||
 					{ commandFailure="Copying .files to /mnt/home/${username} has failed." ; die ; }
 				system "chown ${username}:${username} /home/${username}/${i}"
 				system "chmod 755 /home/${username}/${i}"
@@ -74,7 +74,7 @@ post_install() {
 			unset i
 
 			for i in pipewire-launcher run-mw2 waybar-launcher ; do
-				cp /root/dotfiles/usr/local/bin/"${i}" /mnt/usr/local/bin ||
+				cat /root/dotfiles/usr/local/bin/"${i}" > /mnt/usr/local/bin/"${i}" ||
 					{ commandFailure="Copying scripts to /usr/local/bin has failed." ; die ; }
 				system "chown root:root /usr/local/bin/${i}"
 				system "chmod 755 /usr/local/bin/${i}"
@@ -127,9 +127,7 @@ post_install() {
 				{ commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
 
 			# flatpak everything
-			local flatpaks='com.github.iwalton3.jellyfin-media-player com.github.tchx84.Flatseal com.obsproject.Studio com.valvesoftware.Steam dev.vencord.Vesktop io.gitlab.librewolf-community org.gimp.GIMP org.kde.kdenlive org.prismlauncher.PrismLauncher'
-
-			system "su ${username} -c flatpak install flathub ${flatpaks}"
+			system "su ${username} -c 'flatpak install flathub com.github.iwalton3.jellyfin-media-player com.github.tchx84.Flatseal com.obsproject.Studio com.valvesoftware.Steam dev.vencord.Vesktop io.gitlab.librewolf-community org.gimp.GIMP org.kde.kdenlive org.prismlauncher.PrismLauncher'"
 
 			system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
 
