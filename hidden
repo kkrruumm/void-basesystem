@@ -125,6 +125,14 @@ post_install() {
 
 			system "su ${username} -c flatpak install flathub ${flatpaks}"
 
+			echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
+				{ commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
+
+			echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
+				{ commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
+
+			system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
+
 		;;
 	esac
 }
