@@ -1,7 +1,6 @@
 #!/bin/bash
 
 device=$(cat /sys/devices/virtual/dmi/id/product_name)
-echo "Hidden file triggered, running on $device with $libc"
 
 case "$device" in
 	"Z890 Nova WiFi")
@@ -29,3 +28,103 @@ case "$libc" in
 esac
 
 initrdhostonly="true"
+
+post_install() {
+	case "$device" in
+		"Z890 Nova Wifi")
+
+			if ! which git ; then
+				xbps-install -Su git ||
+					{ commandFailure="Installing git has failed." ; die ; }
+			fi
+
+			mkdir /root/dotfiles ||
+				{ commandFailure="Creating /root/dotfiles has failed." ; die ; }
+
+			git clone https://github.com/kkrruumm/dotfiles /root/dotfiles ||
+				{ commandFailure="Cloning dotfiles has failed." ; die ; }
+
+			if [ "$desktop" == "sway" ]; then
+				install fuzzel fnott foot mpv Thunar waybar imv papirus-icon-theme gnome-keyring gnome-ssh-askpass grimshot pulsemixer tuigreet tumbler swaylock xdg-desktop-portal-gtk
+
+				if [ ! -e /mnt/home/"${username}"/.config ] ; then
+					mkdir /mnt/home/"${username}"/.config ||
+						{ commandFailure="Creating /mnt/home/${username} has failed." ; die ; }
+				fi
+
+				for i in fnott foot fuzzel sway waybar ; do
+					cp -R /root/dotfiles/"${i}" /mnt/home/"${username}"/.config ||
+						{ commandFailure="Copying sway dotfiles to /home/${username}/.config has failed." ; die ; }
+				done
+				unset i
+
+				system "chown -Rf ${username}:${username} /home/${username}/.config"
+				system "chmod -Rf 755 /home/${username}/.config"
+
+				cat /root/dotfiles/usr/local/bin/sway-run > /mnt/usr/local/bin/sway-run ||
+					{ commandFailure="Editing /mnt/usr/local/bin/sway-run has failed." ; die ; }
+			fi
+
+			for i in .bashrc .kshrc .profile ; do
+				cp /root/dotfiles/"${i}" /home/"${username}" ||
+					{ commandFailure="Copying .files to /home/${username} has failed." ; die ; }
+				system "chown ${username}:${username} /home/${username}/${i}"
+				system "chmod 755 /home/${username}/${i}"
+			done
+			unset i
+
+			for i in pipewire-launcher run-mw2 waybar-launcher ; do
+				cp /root/dotfiles/usr/local/bin/"${i}" /mnt/usr/local/bin ||
+					{ commandFailure="Copying scripts to /usr/local/bin has failed." ; die ; }
+				system "chown root:root /usr/local/bin/${i}"
+				system "chmod 755 /usr/local/bin/${i}"
+			done
+			unset i
+
+			# basics
+			install git emacs vim htop openssh wireguard-tools unzip sbctl oksh lm_sensors wget bc dmidecode which
+
+			# extra bits
+			install android-tools android-udev-rules cloc cmus cmus-flac cmusfm dust exiftool gamescope gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager senpai shellcheck steam-udev-rules stress-ng tmux yt-dlp hugo
+
+			# nonsense
+			install pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod
+
+			# config random shit
+			cat /root/dotfiles/etc/rc.local > /mnt/etc/rc.local ||
+				{ commandFailure="Failed to copy new rc.local to system." ; die ; }
+
+			sed -i 's/command =.*/command = "tuigreet --cmd sway-run"/g' /mnt/etc/greetd/config.toml ||
+				{ commandFailure="Failed to edit greetd configuration." ; die ; }
+
+			system "su ${username} -c 'chsh -s /bin/oksh'"
+
+			if [ "$bootloader" == "uki" ] ; then
+				system "xbps-remove -ROoy ukify"
+				mkdir /root/buki && git clone https://github.com/kkrruumm/buki /root/buki
+				cp /root/buki/buki /mnt/usr/local/bin/buki ||
+					{ commandFailure="Installing buki has failed." ; die ; }
+
+				system "chown root:root /usr/local/bin/buki"
+				system "chmod 755 /usr/local/bin/buki"
+				system "chmod +x /usr/local/bin/buki"
+				cat /root/void-basesystem/misc/60-buki > /mnt/etc/kernel.d/post-install/60-ukify ||
+					{ commandFailure="Configuring 60-buki has failed." ; die ; }
+
+				system "mv /etc/kernel.d/post-install/60-ukify /etc/kernel.d/post-install/60-buki"
+
+				install binutils
+				kernelparam_update="true" # trigger rebuild with buki as opposed to ukify
+			fi
+
+			cat /root/void-basesystem/misc/sysctl.conf > /mnt/etc/sysctl.conf ||
+				{ commandFailure="Editing sysctl.conf has failed." ; die ; }
+
+			# flatpak everything
+			local flatpaks='com.github.iwalton3.jellyfin-media-player com.github.tchx84.Flatseal com.obsproject.Studio com.valvesoftware.Steam dev.vencord.Vesktop io.gitlab.librewolf-community org.gimp.GIMP org.kde.kdenlive org.prismlauncher.PrismLauncher'
+
+			system "su ${username} -c flatpak install flathub ${flatpaks}"
+
+		;;
+	esac
+}

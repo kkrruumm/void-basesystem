@@ -1,0 +1,14 @@
+#!/bin/sh                                                                                             
+set -e
+
+PKGNAME="$1"
+VERSION="$2"
+
+[ -x /usr/local/bin/buki ] || exit 0
+
+buki build \
+	-v \
+	-i "${ROOTDIR}"/boot/initramfs-"${VERSION}".img \
+	-k "${ROOTDIR}"/boot/vmlinuz-"${VERSION}" \
+	-o "${ROOTDIR}"/boot/efi/EFI/boot/bootx64.efi \
+	-c 'loglevel=4 module.sig_enforce=1 lockdown=confidentiality init_on_free=1 page_alloc.shuffle=1 randomize_kstack_offset=1 amdgpu.ppfeaturemask=0xffffffff'

@@ -1,4 +1,4 @@
 # void-basesystem
-My hidden settings file for void-install-script
+my "hidden" settings file for [void-install-script](https://github.com/kkrruumm/void-install-script)
 
-Nothing to see here, this is for my own ease of access
+this exists here for my own ease of access, but also serves as an example for usage of this feature
