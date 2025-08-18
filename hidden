@@ -66,8 +66,8 @@ post_install() {
 			fi
 
 			for i in .bashrc .kshrc .profile ; do
-				cp /root/dotfiles/"${i}" /home/"${username}" ||
-					{ commandFailure="Copying .files to /home/${username} has failed." ; die ; }
+				cp /root/dotfiles/"${i}" /mnt/home/"${username}" ||
+					{ commandFailure="Copying .files to /mnt/home/${username} has failed." ; die ; }
 				system "chown ${username}:${username} /home/${username}/${i}"
 				system "chmod 755 /home/${username}/${i}"
 			done
@@ -120,16 +120,16 @@ post_install() {
 			cat /root/void-basesystem/misc/sysctl.conf > /mnt/etc/sysctl.conf ||
 				{ commandFailure="Editing sysctl.conf has failed." ; die ; }
 
-			# flatpak everything
-			local flatpaks='com.github.iwalton3.jellyfin-media-player com.github.tchx84.Flatseal com.obsproject.Studio com.valvesoftware.Steam dev.vencord.Vesktop io.gitlab.librewolf-community org.gimp.GIMP org.kde.kdenlive org.prismlauncher.PrismLauncher'
-
-			system "su ${username} -c flatpak install flathub ${flatpaks}"
-
 			echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
 				{ commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
 
 			echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
 				{ commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
+
+			# flatpak everything
+			local flatpaks='com.github.iwalton3.jellyfin-media-player com.github.tchx84.Flatseal com.obsproject.Studio com.valvesoftware.Steam dev.vencord.Vesktop io.gitlab.librewolf-community org.gimp.GIMP org.kde.kdenlive org.prismlauncher.PrismLauncher'
+
+			system "su ${username} -c flatpak install flathub ${flatpaks}"
 
 			system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
 
