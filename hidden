@@ -31,7 +31,7 @@ initrdhostonly="true"
 
 post_install() {
 	case "$device" in
-		"Z890 Nova Wifi")
+		"Z890 Nova Wifi"|"20L6S09E00")
 
 			if ! which git ; then
 				xbps-install -Su git ||
@@ -74,6 +74,11 @@ post_install() {
 			unset i
 
 			for i in pipewire-launcher run-mw2 waybar-launcher ; do
+				# not playing cod on the thinkpad
+				if [ "$i" == "run-mw2" ] && [ "$device" == "20L6S09E00" ]; then
+					continue
+				fi
+
 				cat /root/dotfiles/usr/local/bin/"${i}" > /mnt/usr/local/bin/"${i}" ||
 					{ commandFailure="Copying scripts to /usr/local/bin has failed." ; die ; }
 				system "chown root:root /usr/local/bin/${i}"
@@ -82,17 +87,25 @@ post_install() {
 			unset i
 
 			# basics
-			install git emacs vim htop openssh wireguard-tools unzip sbctl oksh lm_sensors wget bc dmidecode which
+			packages="git emacs vim htop openssh wireguard-tools unzip oksh lm_sensors wget bc dmidecode which qalculate"
 
 			# extra bits
-			install android-tools android-udev-rules cloc cmus cmus-flac cmusfm dust exiftool gamescope gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager senpai shellcheck steam-udev-rules stress-ng tmux yt-dlp hugo
+			packages+=" cloc dust exiftool gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager shellcheck tmux yt-dlp hugo"
+
+			[ "$device" == "Z890 Nova Wifi" ] &&
+				packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng"
 
 			# nonsense
-			install pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod
+			packages+=" pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod"
+
+			install "$packages"
+			unset packages
 
 			# config random shit
-			cat /root/dotfiles/etc/rc.local > /mnt/etc/rc.local ||
-				{ commandFailure="Failed to copy new rc.local to system." ; die ; }
+			if [ "$device" != "20L6S09E00" ]; then
+				cat /root/dotfiles/etc/rc.local > /mnt/etc/rc.local ||
+					{ commandFailure="Failed to copy new rc.local to system." ; die ; }
+			fi
 
 			sed -i 's/command =.*/command = "tuigreet --cmd sway-run"/g' /mnt/etc/greetd/config.toml ||
 				{ commandFailure="Failed to edit greetd configuration." ; die ; }
