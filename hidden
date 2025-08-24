@@ -66,6 +66,10 @@ post_install() {
 			fi
 
 			for i in .bashrc .kshrc .profile ; do
+				if [ "$i" == ".kshrc" ] && [ "$device" == "20L6S09E00" ] ; then
+					continue
+				fi
+
 				cat /root/dotfiles/"${i}" > /mnt/home/"${username}"/"${i}" ||
 					{ commandFailure="Copying .files to /mnt/home/${username} has failed." ; die ; }
 				system "chown ${username}:${username} /home/${username}/${i}"
@@ -87,18 +91,18 @@ post_install() {
 			unset i
 
 			# basics
-			packages="git emacs vim htop openssh wireguard-tools unzip oksh lm_sensors wget bc dmidecode which qalculate"
+			packages="git emacs vim htop openssh wireguard-tools unzip lm_sensors wget bc dmidecode which qalculate"
 
 			# extra bits
 			packages+=" cloc dust exiftool gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager shellcheck tmux yt-dlp hugo"
 
 			[ "$device" == "Z890 Nova Wifi" ] &&
-				packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng"
+				packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng oksh"
 
 			# nonsense
 			packages+=" pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod"
 
-			install "$packages"
+			install $packages
 			unset packages
 
 			# config random shit
