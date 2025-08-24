@@ -114,7 +114,8 @@ post_install() {
 			sed -i 's/command =.*/command = "tuigreet --cmd sway-run"/g' /mnt/etc/greetd/config.toml ||
 				{ commandFailure="Failed to edit greetd configuration." ; die ; }
 
-			system "su ${username} -c 'chsh -s /bin/oksh'"
+			[ "$device" == "Z890 Nova Wifi" ] &&
+				system "su ${username} -c 'chsh -s /bin/oksh'"
 
 			if [ "$bootloader" == "uki" ] ; then
 				system "xbps-remove -ROoy ukify"
