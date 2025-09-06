@@ -97,7 +97,7 @@ post_install() {
 			packages+=" cloc dust exiftool gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager shellcheck tmux yt-dlp hugo"
 
 			[ "$device" == "Z890 Nova Wifi" ] &&
-				packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng oksh"
+				packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng"
 
 			# nonsense
 			packages+=" pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod"
@@ -113,9 +113,6 @@ post_install() {
 
 			sed -i 's/command =.*/command = "tuigreet --cmd sway-run"/g' /mnt/etc/greetd/config.toml ||
 				{ commandFailure="Failed to edit greetd configuration." ; die ; }
-
-			[ "$device" == "Z890 Nova Wifi" ] &&
-				system "su ${username} -c 'chsh -s /bin/oksh'"
 
 			if [ "$bootloader" == "uki" ] ; then
 				system "xbps-remove -ROoy ukify"
