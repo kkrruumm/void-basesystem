@@ -91,7 +91,7 @@ post_install() {
 			unset i
 
 			# basics
-			packages="git emacs vim htop openssh wireguard-tools unzip lm_sensors wget bc dmidecode which qalculate"
+			packages="git vim htop openssh wireguard-tools unzip lm_sensors wget bc dmidecode which qalculate"
 
 			# extra bits
 			packages+=" cloc dust exiftool gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager shellcheck tmux yt-dlp hugo"
