@@ -65,11 +65,7 @@ post_install() {
 					{ commandFailure="Editing /mnt/usr/local/bin/sway-run has failed." ; die ; }
 			fi
 
-			for i in .bashrc .kshrc .profile ; do
-				if [ "$i" == ".kshrc" ] && [ "$device" == "20L6S09E00" ] ; then
-					continue
-				fi
-
+			for i in .bashrc .profile ; do
 				cat /root/dotfiles/"${i}" > /mnt/home/"${username}"/"${i}" ||
 					{ commandFailure="Copying .files to /mnt/home/${username} has failed." ; die ; }
 				system "chown ${username}:${username} /home/${username}/${i}"
@@ -90,8 +86,11 @@ post_install() {
 			done
 			unset i
 
+            cp -R /root/dotfiles/.emacs.d /mnt/home/"${username}" ||
+                { commandFailure="Copying emacs configuration to /mnt/home/${username} has failed." ; die ;}
+            
 			# basics
-			packages="git vim htop openssh wireguard-tools unzip lm_sensors wget bc dmidecode which qalculate"
+			packages="git vim emacs htop openssh wireguard-tools unzip lm_sensors wget bc dmidecode which qalculate"
 
 			# extra bits
 			packages+=" cloc dust exiftool gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager shellcheck tmux yt-dlp hugo"
