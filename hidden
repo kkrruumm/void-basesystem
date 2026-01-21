@@ -143,5 +143,17 @@ post_install() {
 			system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
 
 		;;
+        "Wyse 3040 Thin Client"|"OptiPlex 3040")
+            echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
+                { commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
+
+            echo 'ignorepkg=linux-firmware-amd' >> /mnt/etc/xbps.d/ignore.conf ||
+                { commandFailure="Setting ignorepkg for linux-firmware-amd has failed." ; die ; }
+
+            echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
+                { commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
+
+            system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-amd linux-firmware-broadcom"
+        ;;
 	esac
 }
