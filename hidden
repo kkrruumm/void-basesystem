@@ -3,146 +3,146 @@
 device=$(cat /sys/devices/virtual/dmi/id/product_name)
 
 case "$device" in
-	"Z890 Nova WiFi")
-		itertime="25000"
-	;;
-	"20L6S09E00")
-		itertime="30000"
-		intel_pstate="false"
-	;;
-	"B550 AORUS PRO AC")
-		itertime="90000"
-	;;
-	*)
-		itertime="30000"
-	;;
+    "Z890 Nova WiFi")
+        itertime="25000"
+    ;;
+    "20L6S09E00")
+        itertime="30000"
+        intel_pstate="false"
+    ;;
+    "B550 AORUS PRO AC")
+        itertime="90000"
+    ;;
+    *)
+        itertime="30000"
+    ;;
 esac
 
 case "$libc" in
-	glibc)
-		basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages glibc-locales xbps iproute2"
-	;;
-	musl)
-		basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages xbps iproute2"
-	;;
+    glibc)
+        basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages glibc-locales xbps iproute2"
+    ;;
+    musl)
+        basesystem="base-files ncurses coreutils findutils diffutils libgcc dash bash grep gzip file sed gawk less util-linux which tar mdocml shadow procps-ng tzdata pciutils usbutils iana-etc dhcpcd kbd iputils nvi ethtool kmod eudev runit-void removed-packages xbps iproute2"
+    ;;
 esac
 
 initrdhostonly="true"
 
 post_install() {
-	case "$device" in
-		"Z890 Nova Wifi"|"20L6S09E00")
+    case "$device" in
+        "Z890 Nova Wifi"|"20L6S09E00")
 
-			if ! which git ; then
-				xbps-install -Su git ||
-					{ commandFailure="Installing git has failed." ; die ; }
-			fi
+            if ! which git ; then
+                xbps-install -Su git ||
+                    { commandFailure="Installing git has failed." ; die ; }
+            fi
 
-			mkdir /root/dotfiles ||
-				{ commandFailure="Creating /root/dotfiles has failed." ; die ; }
+            mkdir /root/dotfiles ||
+                { commandFailure="Creating /root/dotfiles has failed." ; die ; }
 
-			git clone https://github.com/kkrruumm/dotfiles /root/dotfiles ||
-				{ commandFailure="Cloning dotfiles has failed." ; die ; }
+            git clone https://github.com/kkrruumm/dotfiles /root/dotfiles ||
+                { commandFailure="Cloning dotfiles has failed." ; die ; }
 
-			if [ "$desktop" == "sway" ]; then
-				install fuzzel fnott foot mpv Thunar Waybar imv papirus-icon-theme gnome-keyring gnome-ssh-askpass grimshot pulsemixer tuigreet tumbler swaylock xdg-desktop-portal-gtk
+            if [ "$desktop" == "sway" ]; then
+                install fuzzel fnott foot mpv Thunar Waybar imv papirus-icon-theme gnome-keyring gnome-ssh-askpass grimshot pulsemixer tuigreet tumbler swaylock xdg-desktop-portal-gtk
 
-				if [ ! -e /mnt/home/"${username}"/.config ] ; then
-					mkdir /mnt/home/"${username}"/.config ||
-						{ commandFailure="Creating /mnt/home/${username} has failed." ; die ; }
-				fi
+                if [ ! -e /mnt/home/"${username}"/.config ] ; then
+                    mkdir /mnt/home/"${username}"/.config ||
+                        { commandFailure="Creating /mnt/home/${username} has failed." ; die ; }
+                fi
 
-				for i in fnott foot fuzzel sway waybar ; do
-					cp -R /root/dotfiles/"${i}" /mnt/home/"${username}"/.config ||
-						{ commandFailure="Copying sway dotfiles to /home/${username}/.config has failed." ; die ; }
-				done
-				unset i
+                for i in fnott foot fuzzel sway waybar ; do
+                    cp -R /root/dotfiles/"${i}" /mnt/home/"${username}"/.config ||
+                        { commandFailure="Copying sway dotfiles to /home/${username}/.config has failed." ; die ; }
+                done
+                unset i
 
-				system "chown -Rf ${username}:${username} /home/${username}/.config"
-				system "chmod -Rf 755 /home/${username}/.config"
+                system "chown -Rf ${username}:${username} /home/${username}/.config"
+                system "chmod -Rf 755 /home/${username}/.config"
 
-				cat /root/dotfiles/usr/local/bin/sway-run > /mnt/usr/local/bin/sway-run ||
-					{ commandFailure="Editing /mnt/usr/local/bin/sway-run has failed." ; die ; }
-			fi
+                cat /root/dotfiles/usr/local/bin/sway-run > /mnt/usr/local/bin/sway-run ||
+                    { commandFailure="Editing /mnt/usr/local/bin/sway-run has failed." ; die ; }
+            fi
 
-			for i in .bashrc .profile ; do
-				cat /root/dotfiles/"${i}" > /mnt/home/"${username}"/"${i}" ||
-					{ commandFailure="Copying .files to /mnt/home/${username} has failed." ; die ; }
-				system "chown ${username}:${username} /home/${username}/${i}"
-				system "chmod 755 /home/${username}/${i}"
-			done
-			unset i
+            for i in .bashrc .profile ; do
+                cat /root/dotfiles/"${i}" > /mnt/home/"${username}"/"${i}" ||
+                    { commandFailure="Copying .files to /mnt/home/${username} has failed." ; die ; }
+                system "chown ${username}:${username} /home/${username}/${i}"
+                system "chmod 755 /home/${username}/${i}"
+            done
+            unset i
 
-			for i in pipewire-launcher run-mw2 waybar-launcher ; do
-				# not playing cod on the thinkpad
-				if [ "$i" == "run-mw2" ] && [ "$device" == "20L6S09E00" ]; then
-					continue
-				fi
+            for i in pipewire-launcher run-mw2 waybar-launcher ; do
+                # not playing cod on the thinkpad
+                if [ "$i" == "run-mw2" ] && [ "$device" == "20L6S09E00" ]; then
+                    continue
+                fi
 
-				cat /root/dotfiles/usr/local/bin/"${i}" > /mnt/usr/local/bin/"${i}" ||
-					{ commandFailure="Copying scripts to /usr/local/bin has failed." ; die ; }
-				system "chown root:root /usr/local/bin/${i}"
-				system "chmod 755 /usr/local/bin/${i}"
-			done
-			unset i
+                cat /root/dotfiles/usr/local/bin/"${i}" > /mnt/usr/local/bin/"${i}" ||
+                    { commandFailure="Copying scripts to /usr/local/bin has failed." ; die ; }
+                system "chown root:root /usr/local/bin/${i}"
+                system "chmod 755 /usr/local/bin/${i}"
+            done
+            unset i
 
             cp -R /root/dotfiles/.emacs.d /mnt/home/"${username}" ||
                 { commandFailure="Copying emacs configuration to /mnt/home/${username} has failed." ; die ;}
             
-			# basics
-			packages="git vim emacs htop openssh wireguard-tools unzip lm_sensors wget bc dmidecode which qalculate"
+            # basics
+            packages="git vim emacs htop openssh wireguard-tools unzip lm_sensors wget bc dmidecode which qalculate"
 
-			# extra bits
-			packages+=" cloc dust exiftool gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager shellcheck tmux yt-dlp hugo"
+            # extra bits
+            packages+=" cloc dust exiftool gvfs gvfs-mtp nerd-fonts-symbols-ttf nvtop pastel pass virt-manager shellcheck tmux yt-dlp hugo"
 
-			[ "$device" == "Z890 Nova Wifi" ] &&
-				packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng"
+            [ "$device" == "Z890 Nova Wifi" ] &&
+                packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng"
 
-			# nonsense
-			packages+=" pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod"
+            # nonsense
+            packages+=" pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod"
 
-			install $packages
-			unset packages
+            install $packages
+            unset packages
 
-			# config random shit
-			if [ "$device" != "20L6S09E00" ]; then
-				cat /root/dotfiles/etc/rc.local > /mnt/etc/rc.local ||
-					{ commandFailure="Failed to copy new rc.local to system." ; die ; }
-			fi
+            # config random shit
+            if [ "$device" != "20L6S09E00" ]; then
+                cat /root/dotfiles/etc/rc.local > /mnt/etc/rc.local ||
+                    { commandFailure="Failed to copy new rc.local to system." ; die ; }
+            fi
 
-			sed -i 's/command =.*/command = "tuigreet --cmd sway-run"/g' /mnt/etc/greetd/config.toml ||
-				{ commandFailure="Failed to edit greetd configuration." ; die ; }
+            sed -i 's/command =.*/command = "tuigreet --cmd sway-run"/g' /mnt/etc/greetd/config.toml ||
+                { commandFailure="Failed to edit greetd configuration." ; die ; }
 
-			if [ "$bootloader" == "uki" ] ; then
-				system "xbps-remove -ROoy ukify"
-				mkdir /root/buki && git clone https://github.com/kkrruumm/buki /root/buki
-				cp /root/buki/buki /mnt/usr/local/bin/buki ||
-					{ commandFailure="Installing buki has failed." ; die ; }
+            if [ "$bootloader" == "uki" ] ; then
+                system "xbps-remove -ROoy ukify"
+                mkdir /root/buki && git clone https://github.com/kkrruumm/buki /root/buki
+                cp /root/buki/buki /mnt/usr/local/bin/buki ||
+                    { commandFailure="Installing buki has failed." ; die ; }
 
-				system "chown root:root /usr/local/bin/buki"
-				system "chmod 755 /usr/local/bin/buki"
-				system "chmod +x /usr/local/bin/buki"
-				cat /root/void-basesystem/misc/60-buki > /mnt/etc/kernel.d/post-install/60-ukify ||
-					{ commandFailure="Configuring 60-buki has failed." ; die ; }
+                system "chown root:root /usr/local/bin/buki"
+                system "chmod 755 /usr/local/bin/buki"
+                system "chmod +x /usr/local/bin/buki"
+                cat /root/void-basesystem/misc/60-buki > /mnt/etc/kernel.d/post-install/60-ukify ||
+                    { commandFailure="Configuring 60-buki has failed." ; die ; }
 
-				system "mv /etc/kernel.d/post-install/60-ukify /etc/kernel.d/post-install/60-buki"
+                system "mv /etc/kernel.d/post-install/60-ukify /etc/kernel.d/post-install/60-buki"
 
-				install binutils
-				kernelparam_update="true" # trigger rebuild with buki as opposed to ukify
-			fi
+                install binutils
+                kernelparam_update="true" # trigger rebuild with buki as opposed to ukify
+            fi
 
-			cat /root/void-basesystem/misc/sysctl.conf > /mnt/etc/sysctl.conf ||
-				{ commandFailure="Editing sysctl.conf has failed." ; die ; }
+            cat /root/void-basesystem/misc/sysctl.conf > /mnt/etc/sysctl.conf ||
+                { commandFailure="Editing sysctl.conf has failed." ; die ; }
 
-			echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
-				{ commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
+            echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
+                { commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
 
-			echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
-				{ commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
+            echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
+                { commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
 
-			system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
+            system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
 
-		;;
+            ;;
         "Wyse 3040 Thin Client"|"OptiPlex 3040")
             echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
                 { commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
@@ -155,5 +155,11 @@ post_install() {
 
             system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-amd linux-firmware-broadcom"
         ;;
-	esac
+    esac
+
+    # all devices
+    if [ -n "$username" ]; then
+        echo 'clear' >> /mnt/home/"${username}"/.bash_logout ||
+            { commandFailure="Setting clear on bash logout has failed." ; die ; }
+    fi
 }
