@@ -100,7 +100,7 @@ post_install() {
                 packages+=" android-tools android-udev-rules cmus cmus-flac cmusfm gamescope senpai steam-udev-rules stress-ng"
 
             # nonsense
-            packages+=" pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod"
+            packages+=" pfetch fastfetch asciiquarium typioca cbonsai cowsay fortune-mod sl"
 
             install $packages
             unset packages
