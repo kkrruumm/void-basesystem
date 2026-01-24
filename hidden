@@ -30,13 +30,14 @@ esac
 initrdhostonly="true"
 
 post_install() {
+
+    if ! which git ; then
+        xbps-install -Su git ||
+            { commandFailure="Installing git has failed." ; die ; }
+    fi
+    
     case "$device" in
         "Z890 Nova Wifi"|"20L6S09E00")
-
-            if ! which git ; then
-                xbps-install -Su git ||
-                    { commandFailure="Installing git has failed." ; die ; }
-            fi
 
             mkdir /root/dotfiles ||
                 { commandFailure="Creating /root/dotfiles has failed." ; die ; }
@@ -112,49 +113,7 @@ post_install() {
 
             sed -i 's/command =.*/command = "tuigreet --cmd sway-run"/g' /mnt/etc/greetd/config.toml ||
                 { commandFailure="Failed to edit greetd configuration." ; die ; }
-
-            if [ "$bootloader" == "uki" ] ; then
-                system "xbps-remove -ROoy ukify"
-                mkdir /root/buki && git clone https://github.com/kkrruumm/buki /root/buki
-                cp /root/buki/buki /mnt/usr/local/bin/buki ||
-                    { commandFailure="Installing buki has failed." ; die ; }
-
-                system "chown root:root /usr/local/bin/buki"
-                system "chmod 755 /usr/local/bin/buki"
-                system "chmod +x /usr/local/bin/buki"
-                cat /root/void-basesystem/misc/60-buki > /mnt/etc/kernel.d/post-install/60-ukify ||
-                    { commandFailure="Configuring 60-buki has failed." ; die ; }
-
-                system "mv /etc/kernel.d/post-install/60-ukify /etc/kernel.d/post-install/60-buki"
-
-                install binutils
-                kernelparam_update="true" # trigger rebuild with buki as opposed to ukify
-            fi
-
-            cat /root/void-basesystem/misc/sysctl.conf > /mnt/etc/sysctl.conf ||
-                { commandFailure="Editing sysctl.conf has failed." ; die ; }
-
-            echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
-                { commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
-
-            echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
-                { commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
-
-            system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-broadcom"
-
             ;;
-        "Wyse 3040 Thin Client"|"OptiPlex 3040")
-            echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
-                { commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
-
-            echo 'ignorepkg=linux-firmware-amd' >> /mnt/etc/xbps.d/ignore.conf ||
-                { commandFailure="Setting ignorepkg for linux-firmware-amd has failed." ; die ; }
-
-            echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
-                { commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
-
-            system "xbps-remove -ROoy linux-firmware-nvidia linux-firmware-amd linux-firmware-broadcom"
-        ;;
     esac
 
     # all devices
@@ -162,4 +121,49 @@ post_install() {
         echo 'clear' >> /mnt/home/"${username}"/.bash_logout ||
             { commandFailure="Setting clear on bash logout has failed." ; die ; }
     fi
+
+    if [ "$bootloader" == "uki" ]; then
+        system "xbps-remove -ROoy ukify"
+        mkdir /root/buki && git clone https://github.com/kkrruumm/buki /root/buki
+        cp /root/buki/buki /mnt/usr/local/bin/buki ||
+            { commandFailure="Installing buki has failed." ; die ; }
+
+        system "chown root:root /usr/local/bin/buki"
+        system "chmod 755 /usr/local/bin/buki"
+        system "chmod +x /usr/local/bin/buki"
+        cat /root/void-basesystem/misc/60-buki > /mnt/etc/kernel.d/post-install/60-ukify ||
+            { commandFailure="Configuring 60-buki has failed." ; die ; }
+
+        system "mv /etc/kernel.d/post-install/60-ukify /etc/kernel.d/post-install/60-buki"
+
+        install binutils
+        kernelparam_update="true" # trigger rebuild with buki as opposed to ukify
+    fi
+
+    cat /root/void-basesystem/misc/sysctl.conf > /mnt/etc/sysctl.conf ||
+        { commandFailure="Editing sysctl.conf has failed." ; die ; }
+
+    # unneeded blob removal
+    case "$device" in
+        "Wyse 3040 Thin Client"|"OptiPlex 3040"|"20L6S09E00")
+            echo 'ignorepkg=linux-firmware-amd' >> /mnt/etc/xbps.d/ignore.conf ||
+                { commandFailure="Setting ignorepkg for linux-firmware-amd has failed." ; die ; }
+
+            system "xbps-remove -ROoy linux-firmware-amd"
+            ;;
+        "B550 AORUS PRO AC")
+            echo 'ignorepkg=linux-firmware-intel' >> /mnt/etc/xbps.d/ignore.conf ||
+                { commandFailure="Setting ignorepkg for linux-firmware-intel has failed." ; die ; }
+
+            system "xbps-remove -ROoy linux-firmware-intel"
+        ;;
+    esac
+    
+    echo 'ignorepkg=linux-firmware-broadcom' >> /mnt/etc/xbps.d/ignore.conf ||
+        { commandFailure="Setting ignorepkg for linux-firmware-broadcom has failed." ; die ; }
+
+    echo 'ignorepkg=linux-firmware-nvidia' >> /mnt/etc/xbps.d/ignore.conf ||
+        { commandFailure="Setting ignorepkg for linux-firmware-nvidia has failed." ; die ; }
+
+    system "xbps-remove -ROoy linux-firmware-broadcom linux-firmware-nvidia"
 }
